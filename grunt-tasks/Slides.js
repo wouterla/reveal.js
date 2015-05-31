@@ -3,13 +3,13 @@ module.exports = function (grunt) {
   grunt.task.registerTask( 'genLongMethods', 'Generate file list', function() {
     var dataset = Slides.generateSlideDataFromImages('images');
     var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
+    Slides.generateSlides("templates/template.html", "long_method.html", setWithTiming);
   });
 
   grunt.task.registerTask( 'genSparrows', 'Generate file list', function() {
     var dataset = Slides.generateSlideDataFromUrls('sparrows.json');
     var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
+    Slides.generateSlides("templates/template.html", "sparrows.html", setWithTiming);
   });
 
   var Slides = (function() {
@@ -41,11 +41,14 @@ module.exports = function (grunt) {
                        type: file.data[i].type,
                        url: file.data[i].url,
                        index: i,
-                       filename: "images/" + entry.type + "/image-" + entry.index + ".jpg"
+                       filename: "images/" + file.data[i].type + "/image-" + i + ".jpg"
                     });
       }
       createDirectories(types);
+      downloadImages(dataset);
+    }
 
+    var downloadImages = function(dataset) {
       dataset.forEach(function(entry) {
         grunt.util.spawn({
           cmd: 'wget',
