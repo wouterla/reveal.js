@@ -3,13 +3,19 @@ module.exports = function (grunt) {
   grunt.task.registerTask( 'genLongMethods', 'Generate file list', function() {
     var dataset = Slides.generateSlideDataFromImages('images');
     var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "long_method.html", setWithTiming);
+    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
+  });
+
+  grunt.task.registerTask( 'genSparrowsWithDownload', 'Generate file list', function() {
+    var dataset = Slides.generateSlideDataFromUrls('sparrows.json');
+    var setWithTiming = Slides.addTimingToSlideData(dataset);
+    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
   });
 
   grunt.task.registerTask( 'genSparrows', 'Generate file list', function() {
-    var dataset = Slides.generateSlideDataFromUrls('sparrows.json');
+    var dataset = Slides.generateSlideDataFromImages('images');
     var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "sparrows.html", setWithTiming);
+    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
   });
 
   var Slides = (function() {
@@ -37,11 +43,11 @@ module.exports = function (grunt) {
       for (var i = 0; i < file.data.length; i++) {
         //grunt.log.writeln("entry found:" + file.data[i].type + "/" + file.data[i].url);
         if (types.indexOf(file.data[i].type) == -1) { types.push(file.data[i].type) };
-        dataset.push({ project: 'Sparrows',
+        dataset.push({ project: 'images',
                        type: file.data[i].type,
                        url: file.data[i].url,
                        index: i,
-                       filename: "images/" + file.data[i].type + "/image-" + i + ".jpg"
+                       file: "image-" + i + ".jpg"
                     });
       }
       createDirectories(types);
@@ -57,7 +63,7 @@ module.exports = function (grunt) {
       dataset.forEach(function(entry) {
         grunt.util.spawn({
           cmd: 'wget',
-          args: [entry.url, '-O', entry.filename],
+          args: [entry.url, '-O', "images/" + entry.type + "/" + entry.file],
           opts: {stdio: 'inherit'},
         }, function done(error, result, code) {
           grunt.log.writeln("error:" + error);
