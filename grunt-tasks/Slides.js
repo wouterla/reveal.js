@@ -46,6 +46,11 @@ module.exports = function (grunt) {
       }
       createDirectories(types);
       downloadImages(dataset);
+      shuffled = shuffle(dataset);
+      shuffled.forEach(function(entry) {
+        grunt.log.write("entry found: " + entry.type + "/" + entry.file + "\n");
+      });
+      return shuffled;
     }
 
     var downloadImages = function(dataset) {
