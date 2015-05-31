@@ -98,6 +98,16 @@ module.exports = function(grunt) {
 			}
 		},
 
+		generate: {
+			options: {
+				dest : 'generated',
+				map: {
+					templates: "/"
+				}
+			}
+		},
+
+
 		zip: {
 			'reveal-js-presentation.zip': [
 				'index.html',
@@ -142,6 +152,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks( 'grunt-contrib-connect' );
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
 	grunt.loadNpmTasks( 'grunt-zip' );
+	grunt.loadNpmTasks('grunt-generate');
+	grunt.loadTasks('grunt-tasks');
 
 	// Default task
 	grunt.registerTask( 'default', [ 'css', 'js' ] );
