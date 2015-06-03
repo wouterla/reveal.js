@@ -1,34 +1,35 @@
+var shell = require('shelljs');
+
 module.exports = function (grunt) {
 
-  grunt.task.registerTask( 'genLongMethods', 'Generate file list', function() {
-    var dataset = Slides.generateSlideDataFromImages('images');
+  grunt.task.registerTask( 'genLongMethods', 'Generate Long Methods code smell set', function() {
+    var dataset = Slides.generateSlideDataFromImages('Long Methods');
     var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
+    Slides.generateSlides("templates/template.html", "longmethods.html", setWithTiming);
   });
 
-  grunt.task.registerTask( 'genSparrowsWithDownload', 'Generate file list', function() {
-    var dataset = Slides.generateSlideDataFromUrls('sparrows.json');
-    var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
+  grunt.task.registerTask( 'downloadSparrows', 'Download images for Sparrows set', function() {
+    var dataset = Slides.generateSlideDataFromUrls("Sparrows", 'sparrows.json');
   });
 
-  grunt.task.registerTask( 'genSparrows', 'Generate file list', function() {
-    var dataset = Slides.generateSlideDataFromImages('images');
+  grunt.task.registerTask( 'genSparrows', 'Generate Sparrows set', function() {
+    var dataset = Slides.generateSlideDataFromImages('Sparrows');
     var setWithTiming = Slides.addTimingToSlideData(dataset);
-    Slides.generateSlides("templates/template.html", "index.html", setWithTiming);
+    Slides.generateSlides("templates/template.html", "allsparrows.html", setWithTiming);
   });
 
   var Slides = (function() {
 
-    var generateSlideDataFromImages = function(rootDirectory) {
+    var generateSlideDataFromImages = function(project) {
       var slideset = new Array();
 
-      grunt.file.recurse(rootDirectory, function callback(abspath, rootdir, subdir, filename) {
+      grunt.file.recurse("datasets/" + project, function callback(abspath, rootdir, subdir, filename) {
         var entry = { project: rootdir,
                       type: subdir,
                       file: filename };
         slideset.push(entry);
       });
+
       shuffled = shuffle(slideset);
       shuffled.forEach(function(entry) {
         grunt.log.write("entry found: " + entry.type + "/" + entry.file + "\n");
@@ -36,47 +37,52 @@ module.exports = function (grunt) {
       return shuffled;
     }
 
-    var generateSlideDataFromUrls = function(urlsFileName) {
+    var generateSlideDataFromUrls = function(project, urlsFileName) {
       var dataset = new Array();
-      var types = new Array();
-      file = grunt.file.readJSON(urlsFileName);
+      var types = {};
+
+      file = grunt.file.readJSON("datasets/" + urlsFileName);
+
       for (var i = 0; i < file.data.length; i++) {
-        //grunt.log.writeln("entry found:" + file.data[i].type + "/" + file.data[i].url);
-        if (types.indexOf(file.data[i].type) == -1) { types.push(file.data[i].type) };
-        dataset.push({ project: 'images',
+
+        if (types.hasOwnProperty(file.data[i].type)) {
+          types[file.data[i].type]++;
+        } else {
+          types[file.data[i].type] = 1;
+        };
+
+        dataset.push({ project: "datasets/" + project,
                        type: file.data[i].type,
                        url: file.data[i].url,
                        index: i,
                        file: "image-" + i + ".jpg"
                     });
       }
-      createDirectories(types);
+
+      for (var setname in types) {
+        if (types.hasOwnProperty(setname)) {
+          grunt.log.writeln(setname);
+        }
+      }
+
+      createDirectories(project, types);
       downloadImages(dataset);
-      shuffled = shuffle(dataset);
-      shuffled.forEach(function(entry) {
-        grunt.log.write("entry found: " + entry.type + "/" + entry.file + "\n");
-      });
-      return shuffled;
     }
 
     var downloadImages = function(dataset) {
       dataset.forEach(function(entry) {
-        grunt.util.spawn({
-          cmd: 'wget',
-          args: [entry.url, '-O', "images/" + entry.type + "/" + entry.file],
-          opts: {stdio: 'inherit'},
-        }, function done(error, result, code) {
-          grunt.log.writeln("error:" + error);
-          grunt.log.writeln("result:" + result);
-          grunt.log.writeln("code:" + code);
-        });
+        var output = shell.exec('wget -N ' + '"' + entry.url + '"' + ' -O "' + entry.project + '/' + entry.type + '/' + entry.file + '"',
+          { silent: false }
+        ).output;
       });
     }
 
-    var createDirectories = function(directories) {
-      directories.forEach(function(entry) {
-        grunt.file.mkdir("images/" + entry);
-      });
+    var createDirectories = function(project, directories) {
+      for (var setname in directories) {
+        if (directories.hasOwnProperty(setname)) {
+          grunt.file.mkdir("datasets/" + project + "/" + setname);
+        }
+      }
     }
 
     var addTimingToSlideData = function(slideset) {
