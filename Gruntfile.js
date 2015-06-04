@@ -109,13 +109,14 @@ module.exports = function(grunt) {
 
 
 		zip: {
-			'reveal-js-presentation.zip': [
-				'index.html',
+			'fluency-presentations.zip': [
+				'*.html',
 				'css/**',
 				'js/**',
 				'lib/**',
 				'images/**',
-				'plugin/**'
+				'plugin/**',
+				'datasets/**'
 			]
 		},
 
