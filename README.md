@@ -7,29 +7,6 @@ Currently supports two presentations:
 ### Sparrows
 This has a comparison between house, song and chipping sparrows with images gathered from the web. To avoid rights issues, the images are not included. To download all sparrows images, do:
 
-```
-grunt downloadSparrows
-```
-
-To then build the presentation, do:
-
-```
-grunt genSparrows
-```
-
-The presentation is generated as 'allsparrows.html', which means that you can view them on [http://localhost:8000/allsparrows.html](http://localhost:8000/allsparrows.html) after running
-
-```
-grunt serve
-```
-
-### Code Smells: Long Methods
-The first, limited, presentation to train code smells sensitivity. This one trains the difference between long methods, and short enough ones. The images for this presentation are included in the repo, so building it is simply:
-
-```
-grunt genLongMethods
-```
-
 This on is available as [http://localhost:8000/longmethods.html](http://localhost:8000/longmethods.html).
 
 ## extend
